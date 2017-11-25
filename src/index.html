@@ -48,13 +48,19 @@
 	var pointarray = [];
 	var panos=[];
 	var pano_num = 0;
-
+	var panoids[];
 	function showError( message ) {
 		errorDiv.innerHTML = message;
 	}
 
 	function showMessage( message ) {
 		messageDiv.innerHTML += message;
+	}
+	function getPanoid(lat,lng){
+		var streetviewpanorama = new google.maps.StreetViewPanorama(container,{
+			position:new google.maps.LatLng(lat,lng),
+		});
+		return streetviewpanorama.getPano();
 	}
 
 	window.addEventListener( 'load', function() {
@@ -158,6 +164,7 @@
 											var tmppoint = new google.maps.LatLng(beforepoint.lat()+(panopoint.legs[j].steps[k].end_location.lat()-panopoint.legs[j].steps[k].start_location.lat())/splitdist, beforepoint.lng()+(panopoint.legs[j].steps[k].end_location.lng()-panopoint.legs[j].steps[k].start_location.lng())/splitdist);
 											//showMessage("lat:"+(panopoint.legs[j].steps[k].start_location.lat())+"\n");
 											panos.push(tmppoint);
+											
 					          	new google.maps.Marker({position:tmppoint, map:map});
 											//setTimeout(loader.load(tmppoint),1000);
 											beforepoint = tmppoint;
@@ -205,7 +212,7 @@
 
 
 	</script>
-	<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script src="http://maps.google.com/maps/api/js?key=AIzaSyDM7Es3Y-7rZt8XJFbOeZQycXyfNTHNj54"></script>
 	<script src="build/GSVPano.min.js"></script>
 	<div><img id="newImg"></div>
 	</body>

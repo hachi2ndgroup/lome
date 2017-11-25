@@ -24,5 +24,6 @@ func main() {
 	router := httprouter.New()
 	router.GET("/create", create)
 	router.ServeFiles("/image/*filepath", http.Dir("image/"))
+        router.NotFound = http.FileServer(http.Dir("src"))
 	log.Fatal(http.ListenAndServe(":9999", router))
 }
