@@ -48,7 +48,7 @@
 	var pointarray = [];
 	var panos=[];
 	var pano_num = 0;
-	var panoids[];
+	var panoids = [];
 	function showError( message ) {
 		errorDiv.innerHTML = message;
 	}
@@ -149,6 +149,7 @@
 	        // OKの場合ルート描画
 	        if (status == google.maps.DirectionsStatus.OK) {
 	            r.setDirections(result);
+				console.log(result);
 							for (var i=0; i<result.routes.length; i++) {
 				        var panopoint = result.routes[i];
 
@@ -172,6 +173,8 @@
 									}
 									//loader.load(latlng);
 								}
+
+								console.log(panos);
 
 				      }
 							/*new google.maps.DirectionsRenderer({
