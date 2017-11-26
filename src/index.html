@@ -27,206 +27,70 @@
 
 		}
 
-		</style>
+    </style>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+     <!--Import jQuery before materialize.js-->
+     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+     <script type="text/javascript" src="js/materialize.min.js"></script>
 	</head>
 	<body>
+    <h1>Road to lome</h1>
+    <div class="row">
+        <p class="col s1">
+            <input type="button" value="getStreetView" onclick="loader.onPanoramasave()">
+        </p>
+    </div>
+    <div class="row">
+      <div class="col s12">
+        <div id="map_canvas"></div>
+      </div>
+    </div>
+    <div class="row">
+        <div class="col s12">
+          <div id="pano"></div>
+        </div>
+    </div>
+    <!-- スタートボタン -->
+    <div class="row">
+        <a class="waves-effect waves-light btn" id="js_apiStart">setting start</a>        
+    </div>
+    <p id="lome_message"></p>
+    <!-- 読み込みサークル -->
+    <div class="preloader-wrapper small active" style="display:none" id="js_loadCircle">
+        <div class="spinner-layer spinner-green-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div><div class="gap-patch">
+            <div class="circle"></div>
+          </div><div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+    </div>
+    <!-- プログレスバー -->
+    <div class="progress" style="display:none">
+        <div class="determinate" style="width: 0%" id="js_progressBar"></div>
+    </div>
 
-		<h1>GSVPano.js Basic Usage</h1>
-		<p>
-			<input type="button" value="getStreetView" onclick="loader.onPanoramasave()">
-		</p>
-		<div id="messageDiv" ></div>
+		<div id="messageDiv" style="display:none"></div>
 		<div id="errorDiv" ></div>
-		<div id="map_canvas"></div>
 
 
 	<script>
 
-	var messageDiv = document.getElementById( 'messageDiv' );
-	var errorDiv = document.getElementById( 'errorDiv' );
-	var i = 0;
-	var pointarray = [];
-	var panos=[];
-	var pano_num = 0;
-	var panoids = [];
-	function showError( message ) {
-		errorDiv.innerHTML = message;
-	}
 
-	function showMessage( message ) {
-		messageDiv.innerHTML += message;
-	}
-	function getPanoid(lat,lng){
-		var streetviewpanorama = new google.maps.StreetViewPanorama(container,{
-			position:new google.maps.LatLng(lat,lng),
-		});
-		return streetviewpanorama.getPano();
-	}
-
-	window.addEventListener( 'load', function() {
-
-		showMessage( 'Starting...<br/>' );
-
-		loader = new GSVPANO.PanoLoader( {
-			zoom: 3
-		} );
-
-		loader.onSizeChange = function() {
-			showMessage( 'Size changed' );
-		};
-		;
-
-		loader.onPanoramaData = function( result ) {
-			showMessage( 'Panorama OK.<br/>Load started' );
-		}
-
-		loader.onNoPanoramaData = function( status ) {
-			showError("Could not retrieve panorama for the following reason: " + status);
-		}
-
-		loader.onProgress = function( p ) {
-			showMessage( '.' );
-		};
-
-		loader.onError = function( message ) {
-			showMessage( 'Error: ' + message );
-		};
-
-		loader.onPanoramaLoad = function() {
-
-//			showMessage( ' finished.<br/>' );
-			document.body.appendChild( this.canvas );
-			showMessage( 'Panorama loaded, street view data ' + this.copyright + '.<br/>' );
-			var png = this.canvas.toDataURL();
-			var blob = Base64toBlob(png);
-			saveBlob(blob,"imgs/sample.png");
-			document.getElementById("newImg").src = png;
-		};
-
-		loader.onPanoramasave = function(){
-				showMessage("latlng"+panos[i]);
-				loader.load(panos[i]);
-				i++;
-		}
-
-		// Google Maps API 設定
-	var mapDiv = document.getElementById("map_canvas");
-	var map = new google.maps.Map(mapDiv, {
-		center : new google.maps.LatLng(34.8349692, 134.692602),
-		navigationControl: true,
-		draggableCursor: 'crosshair',draggingCursor: 'move',
-		zoom : 15,
-		mapTypeId : google.maps.MapTypeId.ROADMAP
-	});
-	var berkeley = {lat: 37.869085, lng: -122.254775};
-	function processSVData(data, status) {
-  if (status === 'OK') {
-    
-  } else {
-    console.error('Street View data not found for this location.');
-  }
-}
-
-
-	//クリックイベント設定
-	google.maps.event.addListener(map, 'click', function(event){
-		console.log(event.latLng);
-		pointarray.push(event.latLng);
-		var marker = new google.maps.Marker({
-				position:event.latLng,
-				title:"Start Point",
-				Zindex:i
-		});
-		i++;
-		marker.setMap(map);
-		if(pointarray.length>=2){
-				// ルート検索の条件
-	    var request = {
-	        origin: pointarray[0], // 出発地
-	        destination: pointarray[1], // 目的地
-
-	        travelMode: google.maps.DirectionsTravelMode.WALKING, // 交通手段(歩行。DRIVINGの場合は車)
-	    };
-	    var d = new google.maps.DirectionsService(); // ルート検索オブジェクト
-	    var r = new google.maps.DirectionsRenderer({ // ルート描画オブジェクト
-	        map: map, // 描画先の地図
-	        preserveViewport: true, // 描画後に中心点をずらさない
-	    });
-
-	    // ルート検索
-	    d.route(request, function(result, status){
-	        // OKの場合ルート描画
-	        if (status == google.maps.DirectionsStatus.OK) {
-	            r.setDirections(result);
-				console.log(result);
-							for (var i=0; i<result.routes.length; i++) {
-				        var panopoint = result.routes[i];
-
-				        for (var j=0; j<panopoint.legs.length; j++) {
-				          //var latlng = panopoint.overview_path[j];
-									for(var k=0; k<panopoint.legs[j].steps.length;k++){
-
-										var splitdist = panopoint.legs[j].steps[k].distance.value/5; //2m感覚で分割
-										var beforepoint = panopoint.legs[j].steps[k].start_location;
-
-										//showMessage("splitdist:"+splitdist);
-										for(var l=0;l<=splitdist;l++){//ルートを2mごとに区切る
-											var tmppoint = new google.maps.LatLng(beforepoint.lat()+(panopoint.legs[j].steps[k].end_location.lat()-panopoint.legs[j].steps[k].start_location.lat())/splitdist, beforepoint.lng()+(panopoint.legs[j].steps[k].end_location.lng()-panopoint.legs[j].steps[k].start_location.lng())/splitdist);
-											//showMessage("lat:"+(panopoint.legs[j].steps[k].start_location.lat())+"\n");
-											console.log(tmpoint.lat())
-											panos.push(tmppoint);											
-					          				new google.maps.Marker({position:tmppoint, map:map});
-											//setTimeout(loader.load(tmppoint),1000);
-											beforepoint = tmppoint;
-										}
-									}
-									//loader.load(latlng);
-								}
-
-								console.log(panos);
-								
-
-				      }
-							/*new google.maps.DirectionsRenderer({
-      					map: map,
-    						suppressMarkers: true
-    					}).setDirections(result);
-
-    			new google.maps.ElevationService().getElevationAlongPath({
-      			path: result.routes[0].overview_path,
-      			samples: result.routes[0].overview_path.length
-    			}, function(results, status) {
-      			if (status == google.maps.ElevationStatus.OK) {
-        			for (var i in results) {
-          			if (results[i].elevation) {
-            			var elevation = results[i].elevation;
-
-            			var marker = new google.maps.Marker({
-              			position: results[i].location,
-              			map: map
-            			});
-
-            			//attachMessage(marker, "標高 " + elevation + "m");
-          			}
-        			}
-	    			}
-	    		});*/
-
-				}
-
-		//loader.load(event.latLng); //パノラマを表示
-			});
-
-		}
-
-	});
-});
-
-
-
-	</script>
+  </script>
+  <script src="js/main.js"></script>
 	<script src="http://maps.google.com/maps/api/js?key=AIzaSyDM7Es3Y-7rZt8XJFbOeZQycXyfNTHNj54"></script>
-	<script src="build/GSVPano.min.js"></script>
+  <script src="build/GSVPano.min.js"></script>
+  <!-- <script src="build/bluebird.min.js"></script> -->
+  
 	<div><img id="newImg"></div>
 	</body>
 </html>
