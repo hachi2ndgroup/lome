@@ -13,6 +13,12 @@ func create(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	apimethod.Create(w, r, params)
 }
 
+/* ルート情報をポストするところ */
+func setroute(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+       setContentJsonHeader(w)
+       apimethod.Setroute(w, r, params)
+}
+
 
 /* APIのHTTP-HeaderにJsonを入れる*/
 func setContentJsonHeader(w http.ResponseWriter) {
@@ -23,6 +29,7 @@ func setContentJsonHeader(w http.ResponseWriter) {
 func main() {
 	router := httprouter.New()
 	router.GET("/create", create)
+        router.POST("/setroute", setroute)
         router.ServeFiles("/route/*filepath", http.Dir("route/"))
 	router.ServeFiles("/image/*filepath", http.Dir("image/"))
         router.NotFound = http.FileServer(http.Dir("src"))

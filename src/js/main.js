@@ -270,12 +270,12 @@ $(function(){
 	// ルート情報をサーバにアップロード
 	var setRoutesDateOnServer = function() {
 		return new Promise(function(resolve, reject) {
-				var uri = url + "?setroute"
+				var uri = url + "setroute"
 				console.log(uri);
-				$.ajax(uri,
+			$.ajax(uri,
 				{
 					type: 'post',
-					data: panoids,
+					data: JSON.stringify({rotues : panoids}),
 					dataType: 'json'
 				}
 			)
@@ -392,4 +392,3 @@ class MessageController {
 		}
 	}
   }
-   
