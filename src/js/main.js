@@ -269,7 +269,12 @@ $(function(){
 	});
 	// ルート情報をサーバにアップロード
 	var setRoutesDateOnServer = function() {
+		messageController.State(messageController.state.send_panoid_start);
 		return new Promise(function(resolve, reject) {
+			function finish() {
+				messageController.State(messageController.state.send_panoid_finish);
+				resolve();			
+			}
 				var uri = url + "setroute"
 				console.log(uri);
 			$.ajax(uri,
@@ -281,13 +286,13 @@ $(function(){
 			)
 			// 検索成功時にはページに結果を反映
 			.done(function(data) {
-				resolve();				
+				finish();		
 				console.log("成功");
 			})
 			// 検索失敗時には、その旨をダイアログ表示
 			.fail(function() {
-				resolve();		
-				console.error("失敗")		
+				finish();		
+				console.log("失敗")		
 			});			
 		})
 	  };
@@ -345,7 +350,7 @@ $(function(){
 		setRoutesDateOnServer()
 		.then(createPanoramaImageOnServer)
 		.then(function(){
-			console.log("complete");
+			messageController.State(messageController.state.progress_finish);
 		})
 	});
   
@@ -362,8 +367,11 @@ class MessageController {
 	  this.state = {
 		  "load_panoid_start" : 0 ,
 		  "load_panoid_finish" : 1,
-		  "progress_start" : 2,
-		  "progress_change" : 3,
+		  "send_panoid_start" : 2,
+		  "send_panoid_finish" : 3,
+		  "progress_start" : 4,
+		  "progress_change" : 5,
+                  "progress_finish" : 6
 	  };
 	}
 	// 状態によって色々変えるメソッド
@@ -376,6 +384,18 @@ class MessageController {
 			case this.state.load_panoid_finish :
 				this.circle.hide();
 				this.messageDiv.text("パノラマ情報取得に成功しました");
+                                this.apiStartButton.removeClass("disabled");
+			break;
+			case this.state.send_panoid_start :
+				this.messageDiv.text("パノラマ情報をサーバに送信しています");
+                                this.apiStartButton.addClass("disabled");
+				this.circle.show();
+				console.log("start");
+			break;
+			case this.state.send_panoid_finish :
+			console.log("finish");
+				this.messageDiv.text("パノラマ情報の送信を終了しました");
+				this.circle.hide();
 			break;
 			case this.state.progress_start :
 				this.messageDiv.text("パノラマ画像をサーバに生成しています");			
@@ -387,6 +407,9 @@ class MessageController {
 				this.messageDiv.text("パノラマ画像をサーバに生成しています 実行件数" + data.current + "/" + data.length);		
 				this.progressBar.css('width', progress + '%');
 			break;
+                        case this.state.progress_finish :
+                                this.messageDiv.text("セットアップが終了しました");
+                                this.progressBar.parent().hide();
 			default :
 			break;
 		}
