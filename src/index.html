@@ -118,6 +118,15 @@
 		zoom : 15,
 		mapTypeId : google.maps.MapTypeId.ROADMAP
 	});
+	var berkeley = {lat: 37.869085, lng: -122.254775};
+	function processSVData(data, status) {
+  if (status === 'OK') {
+    
+  } else {
+    console.error('Street View data not found for this location.');
+  }
+}
+
 
 	//クリックイベント設定
 	google.maps.event.addListener(map, 'click', function(event){
@@ -164,9 +173,9 @@
 										for(var l=0;l<=splitdist;l++){//ルートを2mごとに区切る
 											var tmppoint = new google.maps.LatLng(beforepoint.lat()+(panopoint.legs[j].steps[k].end_location.lat()-panopoint.legs[j].steps[k].start_location.lat())/splitdist, beforepoint.lng()+(panopoint.legs[j].steps[k].end_location.lng()-panopoint.legs[j].steps[k].start_location.lng())/splitdist);
 											//showMessage("lat:"+(panopoint.legs[j].steps[k].start_location.lat())+"\n");
-											panos.push(tmppoint);
-											
-					          	new google.maps.Marker({position:tmppoint, map:map});
+											console.log(tmpoint.lat())
+											panos.push(tmppoint);											
+					          				new google.maps.Marker({position:tmppoint, map:map});
 											//setTimeout(loader.load(tmppoint),1000);
 											beforepoint = tmppoint;
 										}
@@ -175,6 +184,7 @@
 								}
 
 								console.log(panos);
+								
 
 				      }
 							/*new google.maps.DirectionsRenderer({
